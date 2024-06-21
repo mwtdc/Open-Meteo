@@ -561,10 +561,7 @@ def prepare_forecast_xgboost(forecast_dataframe, test_dataframe):
     # predict_dataframe.to_excel("predict_dataframe.xlsx")
     x["gtp"] = x["gtp"].astype("int")
     predict_dataframe["gtp"] = predict_dataframe["gtp"].astype("int")
-    #
-    x_train, x_validation, y_train, y_validation = train_test_split(
-        x, y, train_size=0.9
-    )
+
     logging.info("Старт предикта на XGBoostRegressor")
 
     param = {
@@ -579,9 +576,7 @@ def prepare_forecast_xgboost(forecast_dataframe, test_dataframe):
         "min_child_weight": 1,
     }
     reg = xgb.XGBRegressor(**param)
-    regr = BaggingRegressor(base_estimator=reg, n_estimators=3, n_jobs=-1).fit(
-        x_train, y_train
-    )
+    regr = BaggingRegressor(base_estimator=reg, n_estimators=3, n_jobs=-1).fit(x, y)
     predict = regr.predict(predict_dataframe)
     test_dataframe["forecast"] = pd.DataFrame(predict)
     test_dataframe["forecast"] = test_dataframe["forecast"] * OVERVALUE_COEFF
